@@ -13,6 +13,7 @@ public class User : BaseEntity
     // For Race Condition
     public byte[]? RowVersion { get; set; }
 
-    //public ICollection<Cred>
+    public ICollection<CreditTransaction> CreditTransactions { get; set; } = new List<CreditTransaction>();
+    public ICollection<MediaAsset> MediaAssets { get; set; } = new List<MediaAsset>();
 
 }
