@@ -15,7 +15,19 @@ public class ProcessingJob : BaseEntity
     public DateTime? StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
 
+
+
     // Navigation Properties
     public MediaAsset MediaAsset { get; private set; } = null!;
     public ICollection<GeneratedContent> GeneratedContents { get; set; } = new List<GeneratedContent>();
+
+    // Constructor to set required properties
+    public ProcessingJob(MediaAsset mediaAsset, JobStatus status)
+    {
+        MediaAsset = mediaAsset;
+        Status = status;
+    }
+
+    // EF Core requires a private parameterless constructor for materialization
+    private ProcessingJob() { }
 }
