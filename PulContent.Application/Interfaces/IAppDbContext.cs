@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using PulContent.Domain.Entities;
+using System;
 
 namespace PulContent.Application.Interfaces;
 
 public interface IAppDbContext
 {
-    Dbset<User>
+    DbSet<User> Users { get; }
+    DbSet<MediaAsset> MediaAssets { get; }
+    DbSet<ProcessingJob> ProcessingJobs { get; }
+    DbSet<GeneratedContent> GeneratedContents { get; }
+    DbSet<CreditTransaction> CreditTransactions { get; }
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
