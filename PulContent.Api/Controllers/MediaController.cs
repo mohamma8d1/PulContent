@@ -16,7 +16,7 @@ namespace PulContent.Api.Controllers
             if (file == null || file.Length == 0)
                 return BadRequest("Please Choose File.");
 
-            var uploadsFolder = Path.Combine(env.WebRootPath, "Uploads"); // Uses wwwroot/Uploads
+            var uploadsFolder = Path.Combine(env.ContentRootPath, "Uploads"); // Uses wwwroot/Uploads
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
@@ -31,8 +31,11 @@ namespace PulContent.Api.Controllers
                 await file.CopyToAsync(stream, cancellationToken);
             }
 
+            var dummyUserId = Guid.Parse("6F6A28F0-F9D4-4093-8FEF-D2BAD2F5B5F6");
+
             var command = new UploadMediaCommand
             {
+                UserId = dummyUserId,
                 OrginalFileName = file.FileName,
                 FileSizeBytes = file.Length,
                 StoredFilePath = relativePath,

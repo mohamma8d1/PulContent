@@ -9,7 +9,7 @@ namespace PulContent.Domain.Entities;
 
 public class ProcessingJob : BaseEntity
 {
-    public Guid MediaAssetId { get; private set; }
+    public Guid MediaAssetId { get; init; }
     public JobStatus Status { get; init; } = JobStatus.Pending;
     public string? ErrorMessage { get; private set; }
     public DateTime? StartedAt { get; private set; }

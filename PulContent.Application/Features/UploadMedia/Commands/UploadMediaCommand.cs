@@ -6,6 +6,7 @@ namespace PulContent.Application.Features.UploadMedia.Commands;
 
 public class UploadMediaCommand : IRequest<UploadMediaResponseDto>
 {
+    public Guid UserId { get; set; }
     public string OrginalFileName { get; set; } = string.Empty;
     public long FileSizeBytes { get; set; }
     public string StoredFilePath { get; set; } = string.Empty;

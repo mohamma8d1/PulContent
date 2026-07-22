@@ -13,6 +13,7 @@ public class UploadMediaCommandHandler(IAppDbContext dbContext) : IRequestHandle
     {
         var mediaAsset = new MediaAsset
         {
+            UserId = request.UserId,
             OriginalFileName = request.OrginalFileName,
             StoredFilePath = request.StoredFilePath,
             FileSizeBytes = request.FileSizeBytes,
@@ -21,7 +22,7 @@ public class UploadMediaCommandHandler(IAppDbContext dbContext) : IRequestHandle
 
         var job = new ProcessingJob
         {
-            MediaAsset = mediaAsset,
+            MediaAssetId = mediaAsset.Id,
             Status = JobStatus.Pending,
         };
 
