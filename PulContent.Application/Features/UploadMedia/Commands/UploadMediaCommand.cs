@@ -9,5 +9,5 @@ public class UploadMediaCommand : IRequest<UploadMediaResponseDto>
     public string OrginalFileName { get; set; } = string.Empty;
     public long FileSizeBytes { get; set; }
     public string StoredFilePath { get; set; } = string.Empty;
-    public int DurationSeconds { get; set; }
+    public int? DurationSeconds { get; set; }
 }

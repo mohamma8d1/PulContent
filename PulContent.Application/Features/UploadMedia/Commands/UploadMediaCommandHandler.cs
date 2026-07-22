@@ -11,18 +11,19 @@ public class UploadMediaCommandHandler(IAppDbContext dbContext) : IRequestHandle
 {
     public async Task<UploadMediaResponseDto> Handle(UploadMediaCommand request, CancellationToken cancellationToken)
     {
-        var mediaAsset = new MediaAsset(
-            request.OrginalFileName,
-            request.StoredFilePath,
-            request.FileSizeBytes,
-            request.DurationSeconds
-        );
+        var mediaAsset = new MediaAsset
+        {
+            OriginalFileName = request.OrginalFileName,
+            StoredFilePath = request.StoredFilePath,
+            FileSizeBytes = request.FileSizeBytes,
+            DurationSeconds = request.DurationSeconds,
+        };
 
         var job = new ProcessingJob
-        (
-            mediaAsset,
-            JobStatus.Pending
-        );
+        {
+            MediaAsset = mediaAsset,
+            Status = JobStatus.Pending,
+        };
 
         dbContext.MediaAssets.Add(mediaAsset);
         dbContext.ProcessingJobs.Add(job);

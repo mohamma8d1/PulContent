@@ -11,10 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\PulContent.Application\PulContent.Application.csproj" />
     <ProjectReference Include="..\PulContent.Domain\PulContent.Domain.csproj" />
     <ProjectReference Include="..\PulContent.Infrastructure\PulContent.Infrastructure.csproj" />

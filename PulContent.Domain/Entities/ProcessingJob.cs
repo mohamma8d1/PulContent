@@ -10,7 +10,7 @@ namespace PulContent.Domain.Entities;
 public class ProcessingJob : BaseEntity
 {
     public Guid MediaAssetId { get; private set; }
-    public JobStatus Status { get; private set; } = JobStatus.Pending;
+    public JobStatus Status { get; init; } = JobStatus.Pending;
     public string? ErrorMessage { get; private set; }
     public DateTime? StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
@@ -18,16 +18,6 @@ public class ProcessingJob : BaseEntity
 
 
     // Navigation Properties
-    public MediaAsset MediaAsset { get; private set; } = null!;
+    public MediaAsset MediaAsset { get; init; } = null!;
     public ICollection<GeneratedContent> GeneratedContents { get; set; } = new List<GeneratedContent>();
-
-    // Constructor to set required properties
-    public ProcessingJob(MediaAsset mediaAsset, JobStatus status)
-    {
-        MediaAsset = mediaAsset;
-        Status = status;
-    }
-
-    // EF Core requires a private parameterless constructor for materialization
-    private ProcessingJob() { }
 }
