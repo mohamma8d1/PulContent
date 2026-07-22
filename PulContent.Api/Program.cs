@@ -1,3 +1,4 @@
+using PulContent.Application.Features.UploadMedia.Commands;
 using PulContent.Infrastructure.DependencyInjection;
 using System.Text.Json.Serialization;
 
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UploadMediaCommandHandler).Assembly));
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
