@@ -10,10 +10,10 @@ namespace PulContent.Domain.Entities;
 public class ProcessingJob : BaseEntity
 {
     public Guid MediaAssetId { get; init; }
-    public JobStatus Status { get; init; } = JobStatus.Pending;
-    public string? ErrorMessage { get; private set; }
-    public DateTime? StartedAt { get; private set; }
-    public DateTime? CompletedAt { get; private set; }
+    public JobStatus Status { get; set; } = JobStatus.Pending;
+    public string? ErrorMessage { get; set; }
+    public DateTime? StartedAt { get; set; }
+    public DateTime? CompletedAt { get; set; }
 
 
 
