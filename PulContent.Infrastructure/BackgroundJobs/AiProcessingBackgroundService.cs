@@ -31,6 +31,12 @@ public class AiProcessingBackgroundService(IServiceProvider serviceProvider) : B
                     Console.WriteLine($"[Worker] job number founded: {pendingJob.Id} for file: {pendingJob.MediaAsset.OriginalFileName}");
 
                     pendingJob.Status = JobStatus.Processing;
+                    pendingJob.StartedAt = DateTime.UtcNow;
+                    await dbContext.SaveChangesAsync(stoppingToken);
+
+                    await Task.Delay(5000, stoppingToken);
+
+                    pendingJob.Status = JobStatus.Completed;
                     pendingJob.CompletedAt = DateTime.UtcNow;
                     await dbContext.SaveChangesAsync(stoppingToken);
 

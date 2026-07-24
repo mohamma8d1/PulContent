@@ -1,8 +1,11 @@
 using PulContent.Application.Features.UploadMedia.Commands;
+using PulContent.Infrastructure.BackgroundJobs;
 using PulContent.Infrastructure.DependencyInjection;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHostedService<AiProcessingBackgroundService>();
 
 // Add services to the container.
 
