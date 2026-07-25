@@ -12,5 +12,8 @@ public class GeneratedContentConfiguration : IEntityTypeConfiguration<GeneratedC
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Type).HasConversion<string>().HasMaxLength(30);
         builder.Property(c => c.ContentBody).IsRequired();
+        builder.HasOne(c => c.ProcessingJob)
+             .WithMany(j => j.GeneratedContents)
+             .HasForeignKey(c => c.JobId);
     }
 }

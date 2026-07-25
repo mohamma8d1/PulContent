@@ -49,9 +49,15 @@ public class AiProcessingBackgroundService(IServiceProvider serviceProvider) : B
                     Console.WriteLine($"[Worker] job Number {pendingJob.Id} Completed successfully!");
                 }
             }
-            catch (Exception ex)
+                        catch (Exception ex)
             {
-                Console.WriteLine($"[Worker] Error while proccess: {ex.Message}");
+                var innerEx = ex.InnerException;
+                Console.WriteLine($"[Worker] Main Error: {ex.Message}");
+                
+                if (innerEx != null)
+                {
+                    Console.WriteLine($"[Worker] SQL Inner Error: {innerEx.Message}");
+                }
 
                 if (pendingJob != null)
                 {
@@ -60,12 +66,11 @@ public class AiProcessingBackgroundService(IServiceProvider serviceProvider) : B
                         pendingJob.Status = JobStatus.Failed;
                         pendingJob.ErrorMessage = ex.Message.Length > 1000 ? ex.Message.Substring(0, 1000) : ex.Message;
                         pendingJob.CompletedAt = DateTime.UtcNow;
-
                         await dbContext.SaveChangesAsync(cancellationToken);
                     }
                     catch (Exception dbEx)
                     {
-                        Console.WriteLine($"[Worker] Failed to update job status in DB: {dbEx.Message}");
+                        Console.WriteLine($"[Worker] Failed to update job status: {dbEx.Message}");
                     }
                 }
             }
