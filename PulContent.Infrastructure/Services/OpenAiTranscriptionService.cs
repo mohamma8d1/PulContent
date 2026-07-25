@@ -22,15 +22,16 @@ public class OpenAiTranscriptionService : IAiService
         if (!File.Exists(fullPath))
             throw new FileNotFoundException($"Audio file not found: {fullPath}");
 
-        var audioData = File.ReadAllBytesAsync(fullPath, cancellationToken);
+        using var audioStream = File.OpenRead(fullPath);
+
+        var fileName = Path.GetFileName(fullPath);
 
         var transcriptionOptions = new AudioTranscriptionOptions
         {
-            ResponseFormat = AudioTranscriptionFormat.Verbose,
             Language = "fa"
         };
 
-        var result = await _audioClient.TranscribeAudioAsync(audioData, transcriptionOptions, cancellationToken);
+        var result = await _audioClient.TranscribeAudioAsync(audioStream, fileName, transcriptionOptions, cancellationToken);
 
         return result.Value.Text;
     }
