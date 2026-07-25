@@ -363,3 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 **/Uploads/
+/PulContent.Api/Models/ggml-base.bin
+/PulContent.Api/appsettings.json
+/PulContent.Api/appsettings.json
