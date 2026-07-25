@@ -20,4 +20,10 @@
     <ProjectReference Include="..\PulContent.Infrastructure\PulContent.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Models\ggml-base.bin">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

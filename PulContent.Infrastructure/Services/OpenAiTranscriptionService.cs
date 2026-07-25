@@ -1,6 +1,8 @@
-﻿using OpenAI.Audio;
+﻿using OpenAI;
+using OpenAI.Audio;
 using PulContent.Application.Interfaces;
 using System;
+using System.ClientModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +14,17 @@ public class OpenAiTranscriptionService : IAiService
 {
     private readonly AudioClient _audioClient;
 
-    public OpenAiTranscriptionService(string apiKey) => _audioClient = new AudioClient("whisper-1", apiKey);
+    public OpenAiTranscriptionService(string apiKey)
+    {
+        var clientOptions = new OpenAIClientOptions()
+        {
+            Endpoint = new Uri("https://api.bazaarlink.ai/v1")
+        };
+
+        var openAIClient = new OpenAIClient(new ApiKeyCredential(apiKey), clientOptions);
+
+        _audioClient = openAIClient.GetAudioClient("whisper-1");
+    }
 
 
     public async Task<string> TranscribeAudioAsync(string filePath, CancellationToken cancellationToken)

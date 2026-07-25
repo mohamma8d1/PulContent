@@ -12,13 +12,15 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
-        var apiKey = config["OpenAi:ApiKey"] ?? throw new ArgumentNullException("ApiKey NotFound!");
+        //var apiKey = config["OpenAi:ApiKey"] ?? throw new ArgumentNullException("ApiKey NotFound!");
 
         services.AddDbContext<AppDbContext>(options => options.UseSqlServer(config.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
-        services.AddScoped<IAiService>(provider => new OpenAiTranscriptionService(apiKey));
+        //services.AddScoped<IAiService>(provider => new OpenAiTranscriptionService(apiKey));
+
+        services.AddScoped<IAiService, LocalWhisperService>();
 
         return services;
     }

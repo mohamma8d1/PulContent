@@ -4,11 +4,6 @@ using Microsoft.Extensions.Hosting;
 using PulContent.Application.Interfaces;
 using PulContent.Domain.Entities;
 using PulContent.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PulContent.Infrastructure.BackgroundJobs;
 
@@ -18,13 +13,14 @@ public class AiProcessingBackgroundService(IServiceProvider serviceProvider) : B
     {
         while (!cancellationToken.IsCancellationRequested)
         {
+            ProcessingJob? pendingJob = null;
             using var scope = serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<IAppDbContext>();
             var aiService = scope.ServiceProvider.GetRequiredService<IAiService>();
 
             try
             {
-                var pendingJob = await dbContext.ProcessingJobs
+                pendingJob = await dbContext.ProcessingJobs
                     .Include(x => x.MediaAsset)
                     .FirstOrDefaultAsync(j => j.Status == JobStatus.Pending, cancellationToken);
 
@@ -52,12 +48,28 @@ public class AiProcessingBackgroundService(IServiceProvider serviceProvider) : B
 
                     Console.WriteLine($"[Worker] job Number {pendingJob.Id} Completed successfully!");
                 }
-
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[Worker] Error while proccess: {ex.Message}");
+
+                if (pendingJob != null)
+                {
+                    try
+                    {
+                        pendingJob.Status = JobStatus.Failed;
+                        pendingJob.ErrorMessage = ex.Message.Length > 1000 ? ex.Message.Substring(0, 1000) : ex.Message;
+                        pendingJob.CompletedAt = DateTime.UtcNow;
+
+                        await dbContext.SaveChangesAsync(cancellationToken);
+                    }
+                    catch (Exception dbEx)
+                    {
+                        Console.WriteLine($"[Worker] Failed to update job status in DB: {dbEx.Message}");
+                    }
+                }
             }
+
             await Task.Delay(10000, cancellationToken);
         }
     }
