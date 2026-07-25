@@ -20,7 +20,10 @@ public static class ServiceCollectionExtensions
 
         //services.AddScoped<IAiService>(provider => new OpenAiTranscriptionService(apiKey));
 
-        services.AddScoped<IAiService, LocalWhisperService>();
+        // Local Whsper
+        //services.AddScoped<IAiService, LocalWhisperService>();
+        // Mock For test
+        services.AddScoped<IAiService, MockAiService>();
 
         return services;
     }
