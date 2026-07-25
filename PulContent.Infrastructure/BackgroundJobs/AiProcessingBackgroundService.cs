@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PulContent.Application.Interfaces;
+using PulContent.Domain.Entities;
 using PulContent.Domain.Enums;
 using System;
 using System.Collections.Generic;
@@ -13,18 +14,19 @@ namespace PulContent.Infrastructure.BackgroundJobs;
 
 public class AiProcessingBackgroundService(IServiceProvider serviceProvider) : BackgroundService
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
             using var scope = serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<IAppDbContext>();
+            var aiService = scope.ServiceProvider.GetRequiredService<IAiService>();
 
             try
             {
                 var pendingJob = await dbContext.ProcessingJobs
                     .Include(x => x.MediaAsset)
-                    .FirstOrDefaultAsync(j => j.Status == JobStatus.Pending, stoppingToken);
+                    .FirstOrDefaultAsync(j => j.Status == JobStatus.Pending, cancellationToken);
 
                 if (pendingJob != null)
                 {
@@ -32,13 +34,21 @@ public class AiProcessingBackgroundService(IServiceProvider serviceProvider) : B
 
                     pendingJob.Status = JobStatus.Processing;
                     pendingJob.StartedAt = DateTime.UtcNow;
-                    await dbContext.SaveChangesAsync(stoppingToken);
+                    await dbContext.SaveChangesAsync(cancellationToken);
 
-                    await Task.Delay(5000, stoppingToken);
+                    string extractText = await aiService.TranscribeAudioAsync(pendingJob.MediaAsset.StoredFilePath, cancellationToken);
+
+                    var generatedContent = new GeneratedContent
+                    {
+                        JobId = pendingJob.Id,
+                        Type = ContentType.FullTranscript,
+                        ContentBody = extractText
+                    };
+                    dbContext.GeneratedContents.Add(generatedContent);
 
                     pendingJob.Status = JobStatus.Completed;
                     pendingJob.CompletedAt = DateTime.UtcNow;
-                    await dbContext.SaveChangesAsync(stoppingToken);
+                    await dbContext.SaveChangesAsync(cancellationToken);
 
                     Console.WriteLine($"[Worker] job Number {pendingJob.Id} Completed successfully!");
                 }
@@ -48,7 +58,7 @@ public class AiProcessingBackgroundService(IServiceProvider serviceProvider) : B
             {
                 Console.WriteLine($"[Worker] Error while proccess: {ex.Message}");
             }
-            await Task.Delay(10000, stoppingToken);
+            await Task.Delay(10000, cancellationToken);
         }
     }
 }

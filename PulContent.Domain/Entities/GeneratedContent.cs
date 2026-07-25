@@ -9,10 +9,10 @@ namespace PulContent.Domain.Entities;
 
 public class GeneratedContent : BaseEntity
 {
-    public Guid JobId { get; private set; }
-    public ContentType Type { get; private set; }
-    public string ContentBody { get; private set; } = string.Empty;
+    public Guid JobId { get; set; }
+    public ContentType Type { get; set; }
+    public string ContentBody { get; set; } = string.Empty;
 
     // Navigation Property
-    public ProcessingJob ProcessingJob { get; private set; } = null!;
+    public ProcessingJob ProcessingJob { get; set; } = null!;
 }
