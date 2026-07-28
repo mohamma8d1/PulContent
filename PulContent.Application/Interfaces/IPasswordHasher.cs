@@ -8,6 +8,6 @@ namespace PulContent.Application.Interfaces;
 
 public interface IPasswordHasher
 {
-    string Hash(string password);
+    string HashPassword(string password);
     bool VerifyPassword(string password, string hashedPassword);
 }

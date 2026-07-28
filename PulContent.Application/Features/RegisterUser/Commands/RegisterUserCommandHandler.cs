@@ -23,7 +23,7 @@ public class RegisterUserCommandHandler(
         if (isEmailExist)
             throw new Exception("This email already exists");
 
-        var hashedPassword = passwordHasher.Hash(request.Password);
+        var hashedPassword = passwordHasher.HashPassword(request.Password);
 
         var user = new User
         {
@@ -35,7 +35,9 @@ public class RegisterUserCommandHandler(
 
         dbContext.Users.Add(user);
 
-        var token = jwtTokenGenerator.GenerateJwtToken(user.Id, user.Email, user.PasswordHash);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        var token = jwtTokenGenerator.GenerateJwtToken(user.Id, user.Email, user.FullName);
 
         return new AuthResponseDto(token);
     }
