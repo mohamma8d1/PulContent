@@ -4,10 +4,6 @@ using PulContent.Application.Features.GetJobResult.DTOs;
 using PulContent.Application.Interfaces;
 using PulContent.Domain.Enums;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PulContent.Application.Features.GetJobResult.Query;
 
