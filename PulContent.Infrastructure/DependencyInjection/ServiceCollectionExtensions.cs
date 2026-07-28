@@ -25,6 +25,8 @@ public static class ServiceCollectionExtensions
         // Mock For test
         services.AddScoped<IAiService, MockAiService>();
 
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
         return services;
     }
 }
