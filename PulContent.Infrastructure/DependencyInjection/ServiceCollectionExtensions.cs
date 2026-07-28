@@ -27,6 +27,8 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
+        services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+
         return services;
     }
 }
