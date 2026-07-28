@@ -4,11 +4,11 @@ namespace PulContent.Domain.Entities;
 
 public class User : BaseEntity
 {
-    public string Email {  get; private set; } = string.Empty;
-    public string PasswordHash { get; private set; } = string.Empty;
-    public string FullName { get; private set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
 
-    public int CreditBalance { get; private set; }
+    public int CreditBalance { get; set; }
 
     // For Race Condition
     public byte[]? RowVersion { get; set; }
