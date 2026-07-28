@@ -1,20 +1,27 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PulContent.Application.Features.UploadMedia.Commands;
+using System.Security.Claims;
 
 namespace PulContent.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class MediaController(IMediator mediator, IWebHostEnvironment env) : ControllerBase
 {
-
     [HttpPost]
     public async Task<IActionResult> UploadMedia(IFormFile file, CancellationToken cancellationToken)
     {
         if (file == null || file.Length == 0)
             return BadRequest("Please Choose File.");
+
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized("Token is not valid.");
 
         var uploadsFolder = Path.Combine(env.ContentRootPath, "Uploads"); // Uses wwwroot/Uploads
         if (!Directory.Exists(uploadsFolder))
@@ -31,11 +38,9 @@ public class MediaController(IMediator mediator, IWebHostEnvironment env) : Cont
             await file.CopyToAsync(stream, cancellationToken);
         }
 
-        var dummyUserId = Guid.Parse("6F6A28F0-F9D4-4093-8FEF-D2BAD2F5B5F6");
-
         var command = new UploadMediaCommand
         {
-            UserId = dummyUserId,
+            UserId = userId,
             OrginalFileName = file.FileName,
             FileSizeBytes = file.Length,
             StoredFilePath = relativePath,
