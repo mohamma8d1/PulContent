@@ -9,7 +9,8 @@ namespace PulContent.Infrastructure.Services;
 
 internal class BcryptPasswordHasher : IPasswordHasher
 {
-    public string Hash(string password)
+
+    public string HashPassword(string password)
     {
         return BCrypt.Net.BCrypt.HashPassword(password);
     }

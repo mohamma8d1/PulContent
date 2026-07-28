@@ -26,7 +26,7 @@ public class JwtTokenGenerator(IConfiguration config) : IJwtTokenGenerator
         };
 
         var token = new JwtSecurityToken(
-                issuer: config["Jwt:Isuuer"],
+                issuer: config["Jwt:Issuer"],
                 audience: config["Jwt:Audience"],
                 claims: claims,
                 expires: DateTime.Now.AddDays(7),
