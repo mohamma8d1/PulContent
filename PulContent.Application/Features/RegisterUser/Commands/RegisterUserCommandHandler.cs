@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using PulContent.Application.Exceptions;
 using PulContent.Application.Features.RegisterUser.DTOs;
 using PulContent.Application.Interfaces;
 using PulContent.Domain.Entities;
@@ -21,7 +22,7 @@ public class RegisterUserCommandHandler(
     {
         var isEmailExist = await dbContext.Users.AnyAsync(e => e.Email == request.Email, cancellationToken);
         if (isEmailExist)
-            throw new Exception("This email already exists");
+            throw new BadRequestException("This email already exists");
 
         var hashedPassword = passwordHasher.HashPassword(request.Password);
 
