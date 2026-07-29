@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PulContent.Application.Interfaces;
+using PulContent.Infrastructure.Consumers;
 using PulContent.Infrastructure.Data;
 using PulContent.Infrastructure.Services;
 using System;
@@ -28,6 +30,17 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+
+        services.AddMassTransit(x =>
+        {
+            x.AddConsumer<MediaProcessingConsumer>();
+
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host("localhost", "/", h => { });
+                cfg.ConfigureEndpoints(context);
+            });
+        });
 
         return services;
     }

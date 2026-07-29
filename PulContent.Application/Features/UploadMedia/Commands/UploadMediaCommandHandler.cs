@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using MassTransit;
+using MediatR;
+using PulContent.Application.Events;
 using PulContent.Application.Features.UploadMedia.DTOs;
 using PulContent.Application.Interfaces;
 using PulContent.Domain.Entities;
@@ -7,7 +9,7 @@ using System;
 
 namespace PulContent.Application.Features.UploadMedia.Commands;
 
-public class UploadMediaCommandHandler(IAppDbContext dbContext) : IRequestHandler<UploadMediaCommand, UploadMediaResponseDto>
+public class UploadMediaCommandHandler(IAppDbContext dbContext, IPublishEndpoint publishEndpoint) : IRequestHandler<UploadMediaCommand, UploadMediaResponseDto>
 {
     public async Task<UploadMediaResponseDto> Handle(UploadMediaCommand request, CancellationToken cancellationToken)
     {
@@ -30,6 +32,8 @@ public class UploadMediaCommandHandler(IAppDbContext dbContext) : IRequestHandle
         dbContext.ProcessingJobs.Add(job);
 
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        await publishEndpoint.Publish(new MediaUploadedEvent(job.Id, mediaAsset.Id), cancellationToken);
 
         return new UploadMediaResponseDto(job.Id, "File created successfuly.Pending.....");
     }
