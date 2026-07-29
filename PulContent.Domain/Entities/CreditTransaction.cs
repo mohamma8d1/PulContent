@@ -9,10 +9,10 @@ namespace PulContent.Domain.Entities;
 
 public class CreditTransaction : BaseEntity
 {
-    public Guid UserId { get; private set; }
-    public TransactionType Type { get; private set; }
-    public int Amount { get; private set; }
-    public string Description { get; private set; } = string.Empty;
+    public Guid UserId { get; init; }
+    public TransactionType Type { get; init; }
+    public int Amount { get; init; }
+    public string Description { get; init; } = string.Empty;
 
-    public User User { get; private set; } = null!;
+    public User User { get; init; } = null!;
 }

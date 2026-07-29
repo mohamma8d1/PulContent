@@ -22,11 +22,32 @@ public class AiProcessingBackgroundService(IServiceProvider serviceProvider) : B
             {
                 pendingJob = await dbContext.ProcessingJobs
                     .Include(x => x.MediaAsset)
+                    .ThenInclude(x => x.User)
                     .FirstOrDefaultAsync(j => j.Status == JobStatus.Pending, cancellationToken);
 
                 if (pendingJob != null)
                 {
-                    Console.WriteLine($"[Worker] job number founded: {pendingJob.Id} for file: {pendingJob.MediaAsset.OriginalFileName}");
+                    var user = pendingJob.MediaAsset.User;
+
+                    if (user.CreditBalance <= 0)
+                    {
+                        pendingJob.Status = JobStatus.Failed;
+                        pendingJob.ErrorMessage = "Insufficient credit balance.";
+                        pendingJob.CompletedAt = DateTime.UtcNow;
+                        await dbContext.SaveChangesAsync(cancellationToken);
+                        Console.WriteLine($"[Worker] Job {pendingJob.Id} failed: insufficient credit for user {user.Id}");
+                        continue;
+                    }
+
+                    user.CreditBalance--;
+                    var transaction = new CreditTransaction
+                    {
+                        UserId = user.Id,
+                        Type = TransactionType.Consume,
+                        Amount = 1,
+                        Description = $"Deducted for job {pendingJob.Id}"
+                    };
+                    dbContext.CreditTransactions.Add(transaction);
 
                     pendingJob.Status = JobStatus.Processing;
                     pendingJob.StartedAt = DateTime.UtcNow;
@@ -64,17 +85,21 @@ public class AiProcessingBackgroundService(IServiceProvider serviceProvider) : B
                     pendingJob.CompletedAt = DateTime.UtcNow;
                     await dbContext.SaveChangesAsync(cancellationToken);
 
-                    Console.WriteLine($"[Worker] job Number {pendingJob.Id} Completed successfully!");
+                    Console.WriteLine($"[Worker] Job {pendingJob.Id} completed successfully!");
                 }
             }
-                        catch (Exception ex)
+            catch (DbUpdateConcurrencyException)
+            {
+                Console.WriteLine($"[Worker] Concurrency conflict for job {pendingJob?.Id}. Will retry on next poll.");
+            }
+            catch (Exception ex)
             {
                 var innerEx = ex.InnerException;
                 Console.WriteLine($"[Worker] Main Error: {ex.Message}");
                 
                 if (innerEx != null)
                 {
-                    Console.WriteLine($"[Worker] SQL Inner Error: {innerEx.Message}");
+                    Console.WriteLine($"[Worker] Inner Error: {innerEx.Message}");
                 }
 
                 if (pendingJob != null)
