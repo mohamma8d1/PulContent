@@ -17,13 +17,17 @@ public class GetJobResultQueryHandler(IAppDbContext dbContext) : IRequestHandler
         if (job == null)
             return null;
 
-        var TranscribeText = job.GeneratedContents.FirstOrDefault(c => c.Type == ContentType.FullTranscript)?.ContentBody;
+        var transcript = job.GeneratedContents.FirstOrDefault(c => c.Type == ContentType.FullTranscript)?.ContentBody;
+        var blogPost = job.GeneratedContents.FirstOrDefault(c => c.Type == ContentType.BlogPost)?.ContentBody;
+        var tweetThread = job.GeneratedContents.FirstOrDefault(c => c.Type == ContentType.TweetThread)?.ContentBody;
 
         return new JobResultDto(
             job.Id,
             job.Status.ToString(),
             job.ErrorMessage,
-            TranscribeText
+            transcript,
+            blogPost,
+            tweetThread
             );
     }
 }

@@ -47,4 +47,9 @@ public class OpenAiTranscriptionService : IAiService
 
         return result.Value.Text;
     }
+
+    public Task<string> GenerateTextAsync(string inputText, string prompt, CancellationToken cancellationToken)
+    {
+        throw new NotSupportedException("OpenAiTranscriptionService does not support text generation.");
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using PulContent.Application.Interfaces;
+using System;
 using System.Diagnostics;
 using System.Text;
 using Whisper.net;
@@ -53,5 +54,10 @@ public class LocalWhisperService : IAiService
         Console.WriteLine($"[Local AI] Transcription completed in {sw.ElapsedMilliseconds} ms.");
 
         return textBuilder.ToString();
+    }
+
+    public Task<string> GenerateTextAsync(string inputText, string prompt, CancellationToken cancellationToken)
+    {
+        throw new NotSupportedException("LocalWhisperService does not support text generation.");
     }
 }

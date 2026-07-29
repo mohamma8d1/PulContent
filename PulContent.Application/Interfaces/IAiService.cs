@@ -9,4 +9,5 @@ namespace PulContent.Application.Interfaces;
 public interface IAiService
 {
     Task<string> TranscribeAudioAsync(string filePath, CancellationToken cancellationToken);
+    Task<string> GenerateTextAsync(string inputText, string prompt, CancellationToken cancellationToken);
 }

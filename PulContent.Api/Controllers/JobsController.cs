@@ -11,7 +11,7 @@ namespace PulContent.Api.Controllers;
 public class JobsController(IMediator mediator) : ControllerBase
 {
 
-    [HttpGet("id:guid/result")]
+    [HttpGet("{id:guid}/result")]
     public async Task<IActionResult> GetResult(Guid id, CancellationToken cancellation)
     {
         var query = new GetJobResultQuery(id);

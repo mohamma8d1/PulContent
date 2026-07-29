@@ -34,13 +34,31 @@ public class AiProcessingBackgroundService(IServiceProvider serviceProvider) : B
 
                     string extractText = await aiService.TranscribeAudioAsync(pendingJob.MediaAsset.StoredFilePath, cancellationToken);
 
-                    var generatedContent = new GeneratedContent
+                    var transcriptContent = new GeneratedContent
                     {
                         JobId = pendingJob.Id,
                         Type = ContentType.FullTranscript,
                         ContentBody = extractText
                     };
-                    dbContext.GeneratedContents.Add(generatedContent);
+                    dbContext.GeneratedContents.Add(transcriptContent);
+
+                    string blogPost = await aiService.GenerateTextAsync(extractText, "Write a detailed Blog Post based on this transcript", cancellationToken);
+                    var blogContent = new GeneratedContent
+                    {
+                        JobId = pendingJob.Id,
+                        Type = ContentType.BlogPost,
+                        ContentBody = blogPost
+                    };
+                    dbContext.GeneratedContents.Add(blogContent);
+
+                    string tweetThread = await aiService.GenerateTextAsync(extractText, "Write a Twitter Thread summarizing this transcript", cancellationToken);
+                    var tweetContent = new GeneratedContent
+                    {
+                        JobId = pendingJob.Id,
+                        Type = ContentType.TweetThread,
+                        ContentBody = tweetThread
+                    };
+                    dbContext.GeneratedContents.Add(tweetContent);
 
                     pendingJob.Status = JobStatus.Completed;
                     pendingJob.CompletedAt = DateTime.UtcNow;

@@ -6,5 +6,7 @@ public record JobResultDto(
     Guid JobId,
     string Status,
     string? ErrorMassage,
-    string? TranscribeText
+    string? TranscribeText,
+    string? BlogPost,
+    string? TweetThread
     );
