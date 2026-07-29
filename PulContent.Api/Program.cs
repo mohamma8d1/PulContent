@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PulContent.Api.Middleware;
 using PulContent.Application.Features.UploadMedia.Commands;
 using PulContent.Infrastructure.BackgroundJobs;
 using PulContent.Infrastructure.DependencyInjection;
@@ -74,6 +75,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+app.UseCustomExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();
