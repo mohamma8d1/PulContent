@@ -15,7 +15,8 @@ namespace PulContent.Application.Features.RegisterUser.Commands;
 public class RegisterUserCommandHandler(
     IAppDbContext dbContext,
     IPasswordHasher passwordHasher,
-    IJwtTokenGenerator jwtTokenGenerator
+    IJwtTokenGenerator jwtTokenGenerator,
+    ICacheService cacheService
     ) : IRequestHandler<RegisterUserCommand, AuthResponseDto>
 {
     public async Task<AuthResponseDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
@@ -37,6 +38,8 @@ public class RegisterUserCommandHandler(
         dbContext.Users.Add(user);
 
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        await cacheService.SetAsync($"user:{user.Id}:credits", user.CreditBalance, cancellationToken);
 
         var token = jwtTokenGenerator.GenerateJwtToken(user.Id, user.Email, user.FullName);
 

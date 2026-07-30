@@ -6,6 +6,7 @@ using PulContent.Application.Interfaces;
 using PulContent.Infrastructure.Consumers;
 using PulContent.Infrastructure.Data;
 using PulContent.Infrastructure.Services;
+using StackExchange.Redis;
 using System;
 
 namespace PulContent.Infrastructure.DependencyInjection;
@@ -30,6 +31,19 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+        {
+            var options = new ConfigurationOptions
+            {
+                EndPoints = { config.GetValue<string>("Redis:Connection") ?? "localhost:6379" },
+                AbortOnConnectFail = false,
+                ConnectTimeout = 3000
+            };
+            return ConnectionMultiplexer.Connect(options);
+        });
+
+        services.AddScoped<ICacheService, RedisCacheService>();
 
         services.AddMassTransit(x =>
         {

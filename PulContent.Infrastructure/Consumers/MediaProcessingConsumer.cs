@@ -7,7 +7,7 @@ using PulContent.Domain.Enums;
 
 namespace PulContent.Infrastructure.Consumers;
 
-public class MediaProcessingConsumer(IAppDbContext dbContext, IAiService aiService) : IConsumer<MediaUploadedEvent>
+public class MediaProcessingConsumer(IAppDbContext dbContext, IAiService aiService, ICacheService cacheService) : IConsumer<MediaUploadedEvent>
 {
     public async Task Consume(ConsumeContext<MediaUploadedEvent> context)
     {
@@ -51,6 +51,13 @@ public class MediaProcessingConsumer(IAppDbContext dbContext, IAiService aiServi
             job.Status = JobStatus.Processing;
             job.StartedAt = DateTime.UtcNow;
             await dbContext.SaveChangesAsync(context.CancellationToken);
+
+            var redisKey = $"user:{user.Id}:credits";
+            var currentCached = await cacheService.GetAsync<int>(redisKey, context.CancellationToken);
+            if (currentCached.HasValue)
+                await cacheService.SetAsync(redisKey, currentCached.Value - 1, context.CancellationToken);
+            else
+                await cacheService.SetAsync(redisKey, user.CreditBalance, context.CancellationToken);
 
             string extractText = await aiService.TranscribeAudioAsync(job.MediaAsset.StoredFilePath, context.CancellationToken);
 
