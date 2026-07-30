@@ -19,7 +19,7 @@ public class LoginCommandHandler(
     {
         var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
 
-        if (user == null || passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
+        if (user == null || !passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
             throw new UnauthorizedAccessException("Email or Password wrong!");
 
         var token = jwtTokenGenerator.GenerateJwtToken(user.Id, user.Email, user.FullName);
