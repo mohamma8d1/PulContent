@@ -365,3 +365,4 @@ FodyWeavers.xsd
 **/Uploads/
 /PulContent.Api/Models/**
 /PulContent.Api/appsettings.json
+/PulContent.Api/appsettings.json
